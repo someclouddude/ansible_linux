@@ -1,11 +1,16 @@
 ---
+# Quick update to keep from spamming hosts file.
 # Example usage: ansible-playbook update-ubuntu.yml -kK -u ubuntu
 
+
+# Working on localhost to read vars_prompt for comma seperated list of nodes.
+# Add each node to a dynamic host group.
 - hosts: localhost
   gather_facts: no
+
   vars_prompt:
   - name: remote_hosts
-    prompt: "Host to update, comma seperated list"
+    prompt: "Comma seperated list of hosts to update"
     private: no
 
   tasks:
@@ -14,9 +19,11 @@
         groups: dyn
       with_items: "{{ remote_hosts.split(',') }}"
 
+# Run the following on the dynamic host group created above.
 - hosts: dyn
   become: yes
-  tasks:
+  
+tasks:
   - name: Install Aptitude if missing.
     apt:
       name: aptitude
@@ -26,4 +33,3 @@
     apt:
       update_cache: yes
       upgrade: yes
-
