@@ -1,0 +1,29 @@
+---
+# Example usage: ansible-playbook update-ubuntu.yml -kK -u ubuntu
+
+- hosts: localhost
+  gather_facts: no
+  vars_prompt:
+  - name: remote_hosts
+    prompt: "Host to update, comma seperated list"
+    private: no
+
+  tasks:
+    - add_host:
+        name: "{{ item }}"
+        groups: dyn
+      with_items: "{{ remote_hosts.split(',') }}"
+
+- hosts: dyn
+  become: yes
+  tasks:
+  - name: Install Aptitude if missing.
+    apt:
+      name: aptitude
+      state: present
+
+  - name: Update repos and upgrade
+    apt:
+      update_cache: yes
+      upgrade: yes
+
